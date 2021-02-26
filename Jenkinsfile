@@ -1,17 +1,12 @@
-podTemplate(containers: [
-    containerTemplate(name: 'golang', image: 'golang:1.8.0', ttyEnabled: true, command: 'cat')
-  ]) {
-      
-    node(POD_LABEL) {
-        stage("versions") {
-            echo "hello world"
-        }
-        stage("test-go") {
-        }
-        stage("test-docker") {
-        }
-        stage("test-dc") {
-        }
+import hudson.plugins.git.*;
 
-    }
-}
+def scm = new GitSCM("git@github.com:dermeister0/Tests.git")
+scm.branches = [new BranchSpec("*/develop")];
+
+def flowDefinition = new org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition(scm, "Jenkinsfile")
+
+def parent = Jenkins.instance
+def job = new org.jenkinsci.plugins.workflow.job.WorkflowJob(parent, "New Job")
+job.definition = flowDefinition
+
+parent.reload()
